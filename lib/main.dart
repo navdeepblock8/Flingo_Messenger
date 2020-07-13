@@ -11,13 +11,13 @@ class messenger extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark(),
+     
       initialRoute: homescreen.id,
       routes: {
         homescreen.id:(context) => homescreen(),
         loginscreen.id:(context)=>loginscreen(),
         registerscreen.id:(context)=>registerscreen(),
-        chatscreen.id:(context)=>chatscreen()
+        chatScreen.id:(context)=>chatScreen()
       },
     );
   }

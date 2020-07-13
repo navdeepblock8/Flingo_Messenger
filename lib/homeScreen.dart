@@ -16,6 +16,12 @@ class _homescreenState extends State<homescreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar(
+        leading: null,
+        centerTitle: true,
+        title: Text('Flingo Chat'),
+        backgroundColor: Colors.purple,
+      ),
         body: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

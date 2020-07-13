@@ -31,7 +31,9 @@ class InputFields extends StatelessWidget {
               color: labelTextColor,
             ),
           ),
-          onChanged: (value){},
+          onChanged: (value){
+            return(value);
+          },
         ),
       ),
     );
