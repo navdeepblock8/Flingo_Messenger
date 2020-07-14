@@ -1,3 +1,4 @@
+import 'package:flingo/appBar.dart';
 import 'package:flingo/chatScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,16 +16,12 @@ class _registerscreenState extends State<registerscreen> {
   bool spinner = false;
   String email;
   String password;
+  String username;
   final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: null,
-        centerTitle: true,
-        title: Text('Flingo Chat'),
-        backgroundColor: Colors.purple,
-      ),
+      appBar: buildAppBar(),
         body: SafeArea(
           child: ModalProgressHUD(
             inAsyncCall: spinner,
@@ -32,6 +29,42 @@ class _registerscreenState extends State<registerscreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
+                 Flexible(
+                child: Hero(
+                  tag: 'logo',
+                  child: Container(
+                    height: 200.0,
+                    child: Image.asset('images/FlingoLogo.PNG'),
+                  ),
+                ),
+              ),
+              Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                  child: Theme(
+                    data: ThemeData(
+                        primaryColor: Colors.purple,
+                        primaryColorDark: Colors.purple),
+                    child: TextField(
+                      keyboardType: TextInputType.emailAddress,
+                      textAlign: TextAlign.center,
+                      obscureText: false,
+                      decoration: InputDecoration(
+                        hintText: 'Enter your Full Name',
+                        labelText: 'Username',
+                        labelStyle: TextStyle(
+                          color: Colors.purple
+                        ),
+                        border: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.purple, width: 5.0)),
+                      ),
+                      
+                      onChanged: (value) {
+                        username = value;
+                      },
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                   child: Theme(
@@ -95,8 +128,13 @@ class _registerscreenState extends State<registerscreen> {
                         spinner = true;                      
                       });
                       try{
-                        final newUser = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+                        await _auth.createUserWithEmailAndPassword(email: email, password: password);
+                        var newUser = await _auth.currentUser();
                       if(newUser != Null){
+                        await newUser.sendEmailVerification();
+                        UserUpdateInfo info = UserUpdateInfo();
+                        info.displayName = username;
+                        await newUser.updateProfile(info);
                         Navigator.pushNamed(context, chatScreen.id);
                       }
                       setState(() {

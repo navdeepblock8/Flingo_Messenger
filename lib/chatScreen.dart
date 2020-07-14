@@ -48,7 +48,7 @@ class _chatScreenState extends State<chatScreen> {
         ],
         centerTitle: true,
         title: Text('Flingo Chat'),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.purple[300],
       ),
       body: SafeArea(
         child: Column(
@@ -57,26 +57,52 @@ class _chatScreenState extends State<chatScreen> {
           children: <Widget>[
             MessageStream(),
             Container(
+              height: 40,
+              color: Colors.purple[300],
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Expanded(
-                    child: TextField(
-                      controller: textController,
-                      onChanged: (value) {
-                        messageText = value;
-                      },
+                    child: Theme(
+                      data: ThemeData(primaryColor: Colors.purple[200],
+                      primaryColorDark: Colors.purple[200]),
+                      child: TextField(
+                        textAlign: TextAlign.start,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.purple[50],
+                           border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                            borderSide: BorderSide(color: Colors.black)
+                          )
+                        ),
+                        controller: textController,
+                        onChanged: (value) {
+                          messageText = value;
+                        },
+                      ),
                     ),
                   ),
                   FlatButton(
-                    color: Colors.black45,
+                   
                     onPressed: () {
-                      _cloud.collection('messages').add(
-                          {'text': messageText, 'user': loggedInUser.email});
+                      if(messageText is String && messageText.toString()!=''){
+                        _cloud.collection('messages').add(
+                          {'text': messageText, 'username': loggedInUser.displayName, 'user':loggedInUser.email,'date': DateTime.now().toIso8601String().toString(),});
                           textController.clear();
+                      }
+                      else{
+                        print(messageText);
+                      }
+                      
                     },
                     child: Text(
                       'Send',
+                      style: TextStyle(
+                        fontSize: 20,
+                      
+                        fontWeight: FontWeight.w500
+                      ),
                     ),
                   ),
                 ],
@@ -93,23 +119,25 @@ class MessageStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: _cloud.collection('messages').snapshots(),
+        stream: _cloud.collection('messages').orderBy('date').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
           }
-          final messages = snapshot.data.documents;
+          final messages = snapshot.data.documents.reversed;
           List<MessageBubble> DisplayMessages = [];
           for (var message in messages) {
             final messagetext = message.data['text'];
             final sender = message.data['user'];
+            final username = message.data['username'];
             final currentUser = loggedInUser.email;
-            final addmessage = MessageBubble(sender: sender, text: messagetext,isMe:currentUser==sender);
+            final addmessage = MessageBubble(sender: username, text: messagetext,isMe:currentUser==sender);
             DisplayMessages.add(addmessage);
           }
 
           return Expanded(
-            child: ListView(children: DisplayMessages),
+            child: ListView(reverse: true,
+              children: DisplayMessages),
           );
         });
   }

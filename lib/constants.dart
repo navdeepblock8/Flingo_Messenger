@@ -10,3 +10,4 @@ const TextStyle mainPagelogo = TextStyle(
 fontSize: 40.0,
 fontWeight: FontWeight.bold
 );
+
